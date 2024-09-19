@@ -1,35 +1,46 @@
-export interface NexiosOptions extends RequestInit {
-  timeout?: number; // Timeout in ms
-  cache?: "force-cache" | "no-store"; // Cache configuration
-  next?: {
-    revalidate?: false | 0 | number; // Cache lifetime control
-    tags?: string[]; // Custom cache tags for revalidation
-  };
-}
-
-// Response type definition
-export interface NexiosResponse<T = any> {
-  data: T;
-  status: number;
-  statusText: string;
-  headers: Headers;
-  config: RequestInit;
-  url: string;
-}
-
-// Request interceptor type
-export type RequestInterceptor = (
-  config: NexiosOptions
-) => Promise<NexiosOptions> | NexiosOptions;
-// Response interceptor type
-export type ResponseInterceptor = (
-  response: Response
-) => Promise<Response> | Response;
+import {
+  processRequestInterceptors,
+  processResponseInterceptors,
+} from "./interceptors";
+import { NexiosOptions, NexiosResponse } from "./interfaces";
+import { RequestInterceptor, ResponseInterceptor } from "./types";
 
 // Core Nexios class
 export class Nexios {
   private requestInterceptors: RequestInterceptor[] = [];
   private responseInterceptors: ResponseInterceptor[] = [];
+  private defaultConfig: NexiosOptions;
+  private baseURL?: string;
+
+  constructor(config: NexiosOptions = {}) {
+    this.defaultConfig = config;
+    this.baseURL = config.baseURL;
+  }
+
+  private static globalDefaults: NexiosOptions = {};
+  private instanceDefaults: NexiosOptions = {};
+
+  static setGlobalDefaults(defaults: NexiosOptions) {
+    this.globalDefaults = { ...this.globalDefaults, ...defaults };
+  }
+
+  static getGlobalDefaults(): NexiosOptions {
+    return this.globalDefaults;
+  }
+
+  // Modify instance defaults after creation
+  setDefaults(defaults: NexiosOptions) {
+    this.instanceDefaults = { ...this.instanceDefaults, ...defaults };
+  }
+
+  // Combine defaults with request-specific options
+  private mergeConfig(config: NexiosOptions): NexiosOptions {
+    return {
+      ...Nexios.getGlobalDefaults(),
+      ...this.instanceDefaults,
+      ...config,
+    };
+  }
 
   // Add request interceptors
   addRequestInterceptor(interceptor: RequestInterceptor) {
@@ -41,26 +52,17 @@ export class Nexios {
     this.responseInterceptors.push(interceptor);
   }
 
-  // Process request interceptors
-  private async processRequestInterceptors(
-    config: NexiosOptions
-  ): Promise<NexiosOptions> {
-    let finalConfig = config;
-    for (const interceptor of this.requestInterceptors) {
-      finalConfig = await interceptor(finalConfig);
+  // Combine baseURL with request URL
+  private getFullURL(url: string): string {
+    if (this.baseURL && !url.startsWith("http")) {
+      return `${this.baseURL}${url}`;
     }
-    return finalConfig;
+    return url;
   }
 
-  // Process response interceptors
-  private async processResponseInterceptors(
-    response: Response
-  ): Promise<Response> {
-    let finalResponse = response;
-    for (const interceptor of this.responseInterceptors) {
-      finalResponse = await interceptor(finalResponse);
-    }
-    return finalResponse;
+  // Serialize parameters
+  private serializeParams(params: Record<string, any> = {}): string {
+    return new URLSearchParams(params).toString();
   }
 
   // Handle Fetch Request
@@ -68,8 +70,11 @@ export class Nexios {
     url: string,
     options: NexiosOptions
   ): Promise<Response> {
-    // Apply request interceptors
-    const finalConfig = await this.processRequestInterceptors(options);
+    // Merge the global, instance, and request-specific config
+    const finalConfig = await processRequestInterceptors(
+      this.mergeConfig(options),
+      this.requestInterceptors
+    );
 
     // Timeout support using AbortController
     const controller = new AbortController();
@@ -79,12 +84,55 @@ export class Nexios {
     }
     finalConfig.signal = controller.signal;
 
+    // Handle params
+    if (finalConfig.params) {
+      url += `?${this.serializeParams(finalConfig.params)}`;
+    }
+
+    // Apply headers
+    const headers = new Headers(finalConfig.headers);
+    if (finalConfig.auth) {
+      const { username, password } = finalConfig.auth;
+      headers.set("Authorization", "Basic " + btoa(`${username}:${password}`));
+    }
+
     // Fetch with extended options for Next.js
-    const response = await fetch(url, finalConfig);
+    const response = await fetch(this.getFullURL(url), {
+      ...finalConfig,
+      headers,
+    });
 
     // Apply response interceptors
-    const finalResponse = await this.processResponseInterceptors(response);
+    const finalResponse = await processResponseInterceptors(
+      response,
+      this.responseInterceptors
+    );
     return finalResponse;
+  }
+
+  // Generic request handling
+  private async makeRequest<T>(
+    url: string,
+    options: NexiosOptions
+  ): Promise<NexiosResponse<T>> {
+    try {
+      const response = await this.handleRequest(url, options);
+      const data = await response.json();
+      return {
+        data,
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+        config: options,
+        url: response.url,
+        request: response, // Storing the response object as 'request' for similarity
+      };
+    } catch (error: any) {
+      throw {
+        response: error.response || {},
+        message: error.message,
+      };
+    }
   }
 
   // GET Request
@@ -93,16 +141,7 @@ export class Nexios {
     options: NexiosOptions = {}
   ): Promise<NexiosResponse<T>> {
     options.method = "GET";
-    const response = await this.handleRequest(url, options);
-    const data = await response.json();
-    return {
-      data,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      config: options,
-      url: response.url,
-    };
+    return this.makeRequest(url, options);
   }
 
   // POST Request
@@ -113,16 +152,7 @@ export class Nexios {
   ): Promise<NexiosResponse<T>> {
     options.method = "POST";
     options.body = JSON.stringify(body);
-    const response = await this.handleRequest(url, options);
-    const data = await response.json();
-    return {
-      data,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      config: options,
-      url: response.url,
-    };
+    return this.makeRequest(url, options);
   }
 
   // PUT Request
@@ -133,39 +163,19 @@ export class Nexios {
   ): Promise<NexiosResponse<T>> {
     options.method = "PUT";
     options.body = JSON.stringify(body);
-    const response = await this.handleRequest(url, options);
-    const data = await response.json();
-    return {
-      data,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      config: options,
-      url: response.url,
-    };
+    return this.makeRequest(url, options);
   }
 
   // DELETE Request
-
   async delete<T>(
     url: string,
     options: NexiosOptions = {}
   ): Promise<NexiosResponse<T>> {
     options.method = "DELETE";
-    const response = await this.handleRequest(url, options);
-    const data = await response.json();
-    return {
-      data,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      config: options,
-      url: response.url,
-    };
+    return this.makeRequest(url, options);
   }
 
   // PATCH Request
-
   async patch<T>(
     url: string,
     body: any,
@@ -173,53 +183,24 @@ export class Nexios {
   ): Promise<NexiosResponse<T>> {
     options.method = "PATCH";
     options.body = JSON.stringify(body);
-    const response = await this.handleRequest(url, options);
-    const data = await response.json();
-    return {
-      data,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      config: options,
-      url: response.url,
-    };
+    return this.makeRequest(url, options);
   }
 
   // HEAD Request
-
   async head<T>(
     url: string,
     options: NexiosOptions = {}
   ): Promise<NexiosResponse<T>> {
     options.method = "HEAD";
-    const response = await this.handleRequest(url, options);
-    const data = await response.json();
-    return {
-      data,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      config: options,
-      url: response.url,
-    };
+    return this.makeRequest(url, options);
   }
 
   // OPTIONS Request
-
   async options<T>(
     url: string,
     options: NexiosOptions = {}
   ): Promise<NexiosResponse<T>> {
     options.method = "OPTIONS";
-    const response = await this.handleRequest(url, options);
-    const data = await response.json();
-    return {
-      data,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      config: options,
-      url: response.url,
-    };
+    return this.makeRequest(url, options);
   }
 }

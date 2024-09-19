@@ -1,14 +1,23 @@
 {
-  "name": "nexios",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "nexios-http",
+  "version": "1.0.7",
+  "description": "A fetch wrapper for Next.js with Axios-like features",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"No tests specified\" && exit 0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "fetch",
+    "nextjs",
+    "axios",
+    "http",
+    "api"
+  ],
+  "author": "Samin Israr Ravi",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.5.5",
     "typescript": "^5.6.2"
