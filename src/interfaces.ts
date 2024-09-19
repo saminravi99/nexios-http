@@ -51,16 +51,10 @@ export interface NexiosOptions extends RequestInit {
 
 export interface NexiosResponse<T = any> {
   data: T;
-
   status: number;
-
   statusText: string;
-
   headers: Headers;
-
   config: NexiosOptions;
-
   url: string;
-
   request?: any;
 }
