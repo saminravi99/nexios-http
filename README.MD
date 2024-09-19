@@ -1,7 +1,3 @@
-Here's a detailed and engaging README file for the `Nexios` package, with a specific focus on usage examples within a Next.js application. This version includes specific Next.js code snippets to demonstrate how `Nexios` can be integrated and used effectively.
-
----
-
 # 🌟 Nexios: A Modern Fetch Library for Next.js 🌟
 
 Welcome to **Nexios**, a sophisticated fetch library designed to seamlessly integrate with Next.js applications. Nexios enhances your data-fetching capabilities with advanced features, including customizable interceptors and default configurations, making it an excellent choice for modern web development.
