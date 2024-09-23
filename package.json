@@ -1,6 +1,6 @@
 {
   "name": "nexios-http",
-  "version": "1.1.0",
+  "version": "1.1.4",
   "description": "A fetch wrapper for Next.js with Axios-like features",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
