@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
-    "go": "npm ppublish",
+    "go": "npm publish",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "keywords": [
