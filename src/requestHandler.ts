@@ -143,12 +143,12 @@ export async function handleRequest<T>(
   }
 
   // Validate response status
-  const validateStatus =
-    finalConfig.validateStatus ||
-    ((status: number) => status >= 200 && status < 300);
-  if (!validateStatus(response.status)) {
-    throw new Error(`Request failed with status code ${response.status}`);
-  }
+  // const validateStatus =
+  //   finalConfig.validateStatus ||
+  //   ((status: number) => status >= 200 && status < 300);
+  // if (!validateStatus(response.status)) {
+  //   throw new Error(`Request failed with status code ${response.status}`);
+  // }
 
   // Create the NexiosResponse object
   const nexiosResponse: NexiosResponse<T> = {
