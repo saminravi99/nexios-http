@@ -1,12 +1,13 @@
 {
   "name": "nexios-http",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "description": "A fetch wrapper for Next.js with Axios-like features",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
+    "go": "npm publish",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "keywords": [

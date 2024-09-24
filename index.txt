@@ -1,0 +1,32 @@
+1. Handling paramsSerializer:
+You can modify how query parameters are serialized using a custom function.
+
+2. transformRequest and transformResponse:
+These functions allow modifying the request data before it’s sent and transforming the response data after it’s received.
+
+3. withCredentials:
+This option will enable sending cookies with cross-origin requests.
+
+4. responseType:
+Support for handling response types such as json, blob, arraybuffer, etc.
+
+5. xsrfCookieName and xsrfHeaderName:
+We can implement Cross-Site Request Forgery (XSRF) protection by adding support for cookies and headers.
+
+6. onUploadProgress and onDownloadProgress:
+Track the progress of uploads and downloads using event listeners.
+
+7. maxContentLength and maxBodyLength:
+Enforce limits on request payload size.
+
+8. validateStatus:
+Custom function to check if the response status is valid.
+
+9. maxRedirects:
+Handle automatic redirection.
+
+10. proxy:
+Add proxy support for requests.
+
+11. cancelToken:
+Allow users to cancel ongoing requests.

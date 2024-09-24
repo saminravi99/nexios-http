@@ -1,5 +1,5 @@
 import { NexiosOptions, NexiosResponse } from "./interfaces";
-import { RequestInterceptor, ResponseInterceptor } from "./types";
+import { NexiosResponseInterceptor, RequestInterceptor } from "./types";
 export declare class Nexios {
     private requestInterceptors;
     private responseInterceptors;
@@ -12,7 +12,7 @@ export declare class Nexios {
     static getGlobalDefaults(): NexiosOptions;
     setDefaults(defaults: NexiosOptions): void;
     addRequestInterceptor(interceptor: RequestInterceptor): void;
-    addResponseInterceptor(interceptor: ResponseInterceptor): void;
+    addResponseInterceptor(interceptor: NexiosResponseInterceptor<any>): void;
     private mergeConfig;
     get<T>(url: string, options?: NexiosOptions): Promise<NexiosResponse<T>>;
     post<T>(url: string, body: any, options?: NexiosOptions): Promise<NexiosResponse<T>>;

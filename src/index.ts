@@ -1,10 +1,10 @@
 import { NexiosOptions, NexiosResponse } from "./interfaces";
 import { handleRequest } from "./requestHandler";
-import { RequestInterceptor, ResponseInterceptor } from "./types";
+import { NexiosResponseInterceptor, RequestInterceptor } from "./types";
 
 export class Nexios {
   private requestInterceptors: RequestInterceptor[] = [];
-  private responseInterceptors: ResponseInterceptor[] = [];
+  private responseInterceptors: NexiosResponseInterceptor<any>[] = [];
   private defaultConfig: NexiosOptions;
   private baseURL?: string;
 
@@ -32,7 +32,7 @@ export class Nexios {
     this.requestInterceptors.push(interceptor);
   }
 
-  addResponseInterceptor(interceptor: ResponseInterceptor) {
+  addResponseInterceptor(interceptor: NexiosResponseInterceptor<any>) {
     this.responseInterceptors.push(interceptor);
   }
 

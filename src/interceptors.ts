@@ -1,4 +1,5 @@
-import { NexiosOptions } from "./interfaces";
+import { NexiosOptions, NexiosResponse } from "./interfaces";
+import { NexiosResponseInterceptor } from "./types";
 
 export async function processRequestInterceptors(
   config: NexiosOptions,
@@ -13,13 +14,27 @@ export async function processRequestInterceptors(
   return finalConfig;
 }
 
-export async function processResponseInterceptors(
-  response: Response,
-  interceptors: Array<(response: Response) => Promise<Response> | Response>
-): Promise<Response> {
-  let finalResponse = response;
+// export async function processResponseInterceptors(
+//   response: Response,
+//   interceptors: Array<(response: Response) => Promise<Response> | Response>
+// ): Promise<Response> {
+//   let finalResponse = response;
+//   for (const interceptor of interceptors) {
+//     finalResponse = await interceptor(finalResponse);
+//   }
+//   return finalResponse;
+// }
+
+export async function processResponseInterceptors<T>(
+  response: NexiosResponse<T>,
+  interceptors: NexiosResponseInterceptor<T>[]
+): Promise<NexiosResponse<T>> {
+  let interceptedResponse = response;
+
+  // Apply each interceptor in the array
   for (const interceptor of interceptors) {
-    finalResponse = await interceptor(finalResponse);
+    interceptedResponse = await interceptor(interceptedResponse);
   }
-  return finalResponse;
+
+  return interceptedResponse;
 }
