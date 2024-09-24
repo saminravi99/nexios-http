@@ -1,4 +1,7 @@
 export interface NexiosOptions extends RequestInit {
+  url?: string;
+  method?: string; // e.g., "GET", "POST", etc.
+  body?: any; // The request body
   baseURL?: string;
   timeout?: number;
   cache?: "force-cache" | "no-store";
@@ -57,4 +60,9 @@ export interface NexiosResponse<T = any> {
   config: NexiosOptions;
   url: string;
   request?: any;
+}
+
+export interface InterceptorHandler<T> {
+  fulfilled: (value: T) => T | Promise<T>;
+  rejected?: (error: any) => any;
 }

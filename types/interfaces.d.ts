@@ -1,4 +1,7 @@
 export interface NexiosOptions extends RequestInit {
+    url?: string;
+    method?: string;
+    body?: any;
     baseURL?: string;
     timeout?: number;
     cache?: "force-cache" | "no-store";
@@ -50,4 +53,8 @@ export interface NexiosResponse<T = any> {
     config: NexiosOptions;
     url: string;
     request?: any;
+}
+export interface InterceptorHandler<T> {
+    fulfilled: (value: T) => T | Promise<T>;
+    rejected?: (error: any) => any;
 }

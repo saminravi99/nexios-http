@@ -1,8 +1,10 @@
+import { InterceptorManager } from "./interceptorManager";
 import { NexiosOptions, NexiosResponse } from "./interfaces";
-import { NexiosResponseInterceptor, RequestInterceptor } from "./types";
 export declare class Nexios {
-    private requestInterceptors;
-    private responseInterceptors;
+    interceptors: {
+        request: InterceptorManager<NexiosOptions>;
+        response: InterceptorManager<NexiosResponse<any>>;
+    };
     private defaultConfig;
     private baseURL?;
     private static globalDefaults;
@@ -11,12 +13,13 @@ export declare class Nexios {
     static setGlobalDefaults(defaults: NexiosOptions): void;
     static getGlobalDefaults(): NexiosOptions;
     setDefaults(defaults: NexiosOptions): void;
-    addRequestInterceptor(interceptor: RequestInterceptor): void;
-    addResponseInterceptor(interceptor: NexiosResponseInterceptor<any>): void;
     private mergeConfig;
+    private makeRequest;
     get<T>(url: string, options?: NexiosOptions): Promise<NexiosResponse<T>>;
     post<T>(url: string, body: any, options?: NexiosOptions): Promise<NexiosResponse<T>>;
     put<T>(url: string, body: any, options?: NexiosOptions): Promise<NexiosResponse<T>>;
     delete<T>(url: string, options?: NexiosOptions): Promise<NexiosResponse<T>>;
-    private makeRequest;
+    create(): Nexios;
 }
+declare const nexiosInstance: Nexios;
+export default nexiosInstance;

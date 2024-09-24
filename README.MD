@@ -1,14 +1,14 @@
-# 🌟 Nexios: A Modern Fetch Library for Next.js 🌟
+# 🌟 Nexios: The Ultimate Fetch Library for Next.js 🌟
 
-Welcome to **Nexios**, a sophisticated fetch library designed to seamlessly integrate with Next.js applications. Nexios enhances your data-fetching capabilities with advanced features, including customizable interceptors and default configurations, making it an excellent choice for modern web development.
+Welcome to **Nexios**, a cutting-edge fetch library crafted for seamless integration with Next.js applications. With Nexios, you can enhance your data-fetching capabilities using advanced features like customizable interceptors and default configurations. This library is the perfect companion for modern web development, enabling you to build robust, efficient applications with ease.
 
 ## 🚀 Features
 
-- **🔧 Customizable Interceptors**: Modify requests and responses with ease.
-- **⚙️ Configurable Defaults**: Apply global and instance-specific defaults.
-- **🔐 Secure Token Management**: Automatically include authentication tokens.
-- **🔄 Response Transformation**: Adjust response data as needed.
-- **🌍 Tailored for Next.js**: Effortlessly integrate with Next.js environments.
+- **🔧 Customizable Interceptors**: Effortlessly modify requests and responses to meet your needs.
+- **⚙️ Configurable Defaults**: Set global and instance-specific defaults for consistent behavior.
+- **🔐 Secure Token Management**: Automatically include authentication tokens for secure API access.
+- **🔄 Response Transformation**: Adjust and manipulate response data as required.
+- **🌍 Tailored for Next.js**: Integrate smoothly with Next.js environments to maximize performance.
 
 ## 📦 Installation
 
@@ -22,11 +22,9 @@ yarn add nexios-http
 
 ## 🛠️ Getting Started
 
-To integrate Nexios into your Next.js application, follow these steps:
+### 1. Create a Nexios Configuration File
 
-### **1. Create a Nexios Configuration File**
-
-Create a configuration file to set up your Nexios instance with default settings and interceptors. This file will handle global configurations and interceptors for all requests.
+Create a configuration file to set up your Nexios instance with default settings and interceptors. This file will manage global configurations and interceptors for all requests.
 
 **`nexios.config.ts`**
 
@@ -49,7 +47,7 @@ const defaultConfig: NexiosOptions = {
 const nexiosInstance = new Nexios(defaultConfig);
 
 // Add request interceptor
-nexiosInstance.addRequestInterceptor((config) => {
+nexiosInstance.interceptors.request.use((config) => {
   const accessToken = cookies().get("accessToken")?.value;
 
   if (accessToken) {
@@ -63,7 +61,7 @@ nexiosInstance.addRequestInterceptor((config) => {
 });
 
 // Add response interceptor
-nexiosInstance.addResponseInterceptor((response) => {
+nexiosInstance.interceptors.response.use((response) => {
   // Transform response data if needed
   return response;
 });
@@ -71,7 +69,7 @@ nexiosInstance.addResponseInterceptor((response) => {
 export default nexiosInstance;
 ```
 
-### **2. Use Nexios in Your Next.js Pages**
+### 2. Use Nexios in Your Next.js Pages
 
 Now that you have a configured Nexios instance, you can use it in your Next.js pages to make HTTP requests.
 
@@ -92,9 +90,9 @@ export default async function Home() {
 }
 ```
 
-### **3. Handle Errors Gracefully**
+### 3. Handle Errors Gracefully
 
-Catch and handle errors effectively to improve user experience.
+Catch and handle errors effectively to enhance user experience.
 
 **Example Error Handling**
 
@@ -117,37 +115,32 @@ export default async function Home() {
 
 ## 📚 API Documentation
 
-### **`Nexios` Class**
+### Nexios Class
 
-#### **Constructor**
+- **Constructor**: `constructor(config: NexiosOptions = {})`
+  - **config**: Optional configuration object to initialize the instance.
 
-```typescript
-constructor(config: NexiosOptions = {})
-```
+### Static Methods
 
-- **`config`**: Optional configuration object to initialize the instance.
+- **setGlobalDefaults(defaults: NexiosOptions)**: Set global configuration defaults for all Nexios instances.
+- **getGlobalDefaults(): NexiosOptions**: Retrieve global configuration defaults.
 
-#### **Static Methods**
+### Instance Methods
 
-- **`setGlobalDefaults(defaults: NexiosOptions)`**: Set global configuration defaults for all Nexios instances.
-- **`getGlobalDefaults(): NexiosOptions`**: Retrieve global configuration defaults.
-
-#### **Instance Methods**
-
-- **`setDefaults(defaults: NexiosOptions)`**: Set instance-specific defaults.
-- **`addRequestInterceptor(interceptor: RequestInterceptor)`**: Add a request interceptor.
-- **`addResponseInterceptor(interceptor: ResponseInterceptor)`**: Add a response interceptor.
-- **`get<T>(url: string, options?: NexiosOptions): Promise<NexiosResponse<T>>`**: Perform a GET request.
-- **`post<T>(url: string, body: any, options?: NexiosOptions): Promise<NexiosResponse<T>>`**: Perform a POST request.
-- **`put<T>(url: string, body: any, options?: NexiosOptions): Promise<NexiosResponse<T>>`**: Perform a PUT request.
-- **`delete<T>(url: string, options?: NexiosOptions): Promise<NexiosResponse<T>>`**: Perform a DELETE request.
-- **`patch<T>(url: string, body: any, options?: NexiosOptions): Promise<NexiosResponse<T>>`**: Perform a PATCH request.
-- **`head<T>(url: string, options?: NexiosOptions): Promise<NexiosResponse<T>>`**: Perform a HEAD request.
-- **`options<T>(url: string, options?: NexiosOptions): Promise<NexiosResponse<T>>`**: Perform an OPTIONS request.
+- **setDefaults(defaults: NexiosOptions)**: Set instance-specific defaults.
+- **addRequestInterceptor(interceptor: RequestInterceptor)**: Add a request interceptor.
+- **addResponseInterceptor(interceptor: ResponseInterceptor)**: Add a response interceptor.
+- **get<T>(url: string, options?: NexiosOptions)**: Perform a GET request.
+- **post<T>(url: string, body: any, options?: NexiosOptions)**: Perform a POST request.
+- **put<T>(url: string, body: any, options?: NexiosOptions)**: Perform a PUT request.
+- **delete<T>(url: string, options?: NexiosOptions)**: Perform a DELETE request.
+- **patch<T>(url: string, body: any, options?: NexiosOptions)**: Perform a PATCH request.
+- **head<T>(url: string, options?: NexiosOptions)**: Perform a HEAD request.
+- **options<T>(url: string, options?: NexiosOptions)**: Perform an OPTIONS request.
 
 ## 💡 Advanced Usage
 
-### **Customizing Headers**
+### Customizing Headers
 
 Modify headers for specific requests:
 
@@ -155,7 +148,7 @@ Modify headers for specific requests:
 nexiosInstance.get("/endpoint", { headers: { "X-Custom-Header": "value" } });
 ```
 
-### **Timeout Handling**
+### Timeout Handling
 
 Set request-specific timeouts:
 
@@ -163,9 +156,9 @@ Set request-specific timeouts:
 nexiosInstance.get("/endpoint", { timeout: 5000 });
 ```
 
-### **Handling Caching**
+### Handling Caching
 
-Manage caching with the `cache` option:
+Manage caching with the cache option:
 
 ```typescript
 nexiosInstance.get("/endpoint", { cache: "no-store" });
@@ -173,20 +166,12 @@ nexiosInstance.get("/endpoint", { cache: "no-store" });
 
 ## 📜 License
 
-**Nexios** is licensed under the [MIT License](LICENSE).
+Nexios is licensed under the MIT License.
 
 ## 🙋‍♂️ Support
 
 For support, please open an issue on the [GitHub repository](https://github.com/saminravi99/nexios-http/issues).
 
-## 👥 Contributing
-
-We welcome contributions! Please refer to the [contributing guidelines](CONTRIBUTING.md) for more information.
-
 ---
 
-Thank you for choosing Nexios! We hope it simplifies your data-fetching needs and enhances your Next.js development experience. Happy coding! 🚀✨
-
----
-
-Feel free to adjust URLs and repository links to match your actual project details. This README file aims to provide a comprehensive, user-friendly guide to integrating and using Nexios in a Next.js environment.
+Thank you for choosing **Nexios**! We hope it simplifies your data-fetching needs and enhances your Next.js development experience. **Happy coding!** 🚀✨

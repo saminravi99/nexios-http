@@ -16,7 +16,9 @@ export async function handleRequest<T>(
   // Process request interceptors
   const finalConfig = await processRequestInterceptors(
     options,
-    requestInterceptors
+    requestInterceptors.filter(
+      (interceptor) => typeof interceptor === "function"
+    )
   );
 
   // Handle request timeout and cancelToken using AbortController
@@ -162,7 +164,9 @@ export async function handleRequest<T>(
   // Process response interceptors
   const finalResponse = await processResponseInterceptors(
     nexiosResponse,
-    responseInterceptors
+    responseInterceptors.filter(
+      (interceptor) => typeof interceptor === "function"
+    )
   );
 
   return finalResponse;

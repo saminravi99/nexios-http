@@ -1,8 +1,10 @@
+// types.ts
+
 import { NexiosOptions, NexiosResponse } from "./interfaces";
 
 export type RequestInterceptor = (
   config: NexiosOptions
-) => Promise<NexiosOptions> | NexiosOptions;
+) => NexiosOptions | Promise<NexiosOptions>;
 
 export type ResponseInterceptor = (
   response: Response
